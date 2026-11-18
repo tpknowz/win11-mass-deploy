@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="fil">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Win11 Fleet Imaging</title>
+<meta name="description" content="Konsepto ng sabay-sabay na pag-install ng Windows 11 sa daan-daang laptop gamit ang isang master image.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F2F4F7; --surface:#FFFFFF; --ink:#15202B; --muted:#5B6979; --line:#D8DEE6;
+  --accent:#2457D6; --accent-soft:#E2E9FB;
+  --amber:#A86400; --amber-soft:#FFF0D6;
+  --ok:#157A5B; --ok-soft:#DBF2E8;
+  --f-display:"Archivo","Segoe UI",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",Consolas,"Courier New",monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E141B; --surface:#161F29; --ink:#E5EBF2; --muted:#98A6B6; --line:#283442;
+  --accent:#6E98FF; --accent-soft:#1B2949; --amber:#F2AC3F; --amber-soft:#3A2A0F;
+  --ok:#4CC69B; --ok-soft:#113026; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E141B; --surface:#161F29; --ink:#E5EBF2; --muted:#98A6B6; --line:#283442;
+  --accent:#6E98FF; --accent-soft:#1B2949; --amber:#F2AC3F; --amber-soft:#3A2A0F;
+  --ok:#4CC69B; --ok-soft:#113026; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--f-body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(30px,5vw,46px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:clamp(22px,3vw,28px);font-weight:800}
+h3{font-size:17px;font-weight:600}
+p{margin:0}
+
+header{padding-block:48px 28px;display:grid;gap:18px}
+.eyebrow{font:500 12px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.lede{max-width:66ch;color:var(--muted);font-size:16px}
+.facts{display:flex;flex-wrap:wrap;gap:10px}
+.fact{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;display:grid}
+.fact b{font:800 22px/1.1 var(--f-display);font-variant-numeric:tabular-nums}
+.fact span{font-size:12px;color:var(--muted)}
+
+section{padding-block:36px;border-top:1px solid var(--line);display:grid;gap:18px}
+.sec-head{display:grid;gap:6px}
+.sec-head .num{font:500 12px/1 var(--f-mono);color:var(--accent);letter-spacing:.1em}
+.sec-head p{color:var(--muted);max-width:68ch}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;min-width:0}
+.figure{overflow-x:auto}
+.figure svg{display:block;width:100%;height:auto;min-width:640px}
+.caption{font-size:12.5px;color:var(--muted);margin-top:8px}
+
+.s-ink{fill:var(--ink)} .s-muted{fill:var(--muted)} .s-accent{fill:var(--accent)} .s-ok{fill:var(--ok)}
+.s-screen{fill:currentColor}
+.t{font-family:var(--f-body);font-size:13px;fill:var(--ink)}
+.t-b{font-family:var(--f-display);font-weight:600;font-size:15px;fill:var(--ink)}
+.t-m{font-family:var(--f-mono);font-size:11.5px;fill:var(--muted)}
+.t-a{font-family:var(--f-mono);font-size:12px;fill:var(--accent)}
+.wire{stroke:var(--muted);stroke-width:1.4;fill:none}
+.wire-a{stroke:var(--accent);stroke-width:3;fill:none}
+.wire-d{stroke:var(--muted);stroke-width:1.4;stroke-dasharray:5 4;fill:none}
+.box{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+.box-a{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+.st-done{color:var(--ok)} .st-run{color:var(--accent)} .st-wait{color:var(--muted)}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;padding:0;margin:0;counter-reset:c}
+.cards li{list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:6px;align-content:start}
+.cards li::before{counter-increment:c;content:counter(c);font:600 12px var(--f-mono);color:var(--accent);width:26px;height:26px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center}
+.cards li p{font-size:14px;color:var(--muted)}
+
+.track{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0;padding:0;margin:0}
+.track li{list-style:none;position:relative;padding:34px 10px 0 0;font-size:13px;display:grid;gap:3px;align-content:start}
+.track li::before{content:"";position:absolute;top:10px;left:0;right:0;height:3px;background:var(--line)}
+.track li::after{content:"";position:absolute;top:4px;left:0;width:15px;height:15px;border-radius:50%;background:var(--surface);border:3px solid var(--accent)}
+.track li.auto::after{border-color:var(--ok)}
+.track li.manual::after{border-color:var(--amber);background:var(--amber)}
+.track li b{font-family:var(--f-display);font-weight:600;font-size:14px}
+.track li span{color:var(--muted);font-size:12px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px;border:3px solid}
+
+.why{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.why .panel{display:grid;gap:6px}
+.why .panel p{font-size:14px;color:var(--muted)}
+
+.planner{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;align-items:end}
+.planner label{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+.planner input{font:500 16px var(--f-mono);padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%}
+.out{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.out div{background:var(--accent-soft);border-radius:8px;padding:10px 14px;display:grid}
+.out b{font:800 22px var(--f-display);font-variant-numeric:tabular-nums;color:var(--accent)}
+.out span{font-size:12px;color:var(--muted)}
+
+footer{padding-block:30px 50px;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="lap" viewBox="0 0 60 40">
+      <rect x="8" y="1" width="44" height="29" rx="3" class="s-ink"/>
+      <rect x="11" y="4" width="38" height="23" rx="1" class="s-screen"/>
+      <path d="M1 32h58l-5 7H6z" class="s-ink"/>
+    </symbol>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" class="s-muted"/>
+    </marker>
+    <marker id="arrA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" class="s-accent"/>
+    </marker>
+  </defs>
+</svg>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Concept · Windows 11 mass deployment</div>
+  <h1>600 laptops, isang master image</h1>
+  <p class="lede">Isang laptop lang ang inaayos nang mano-mano: ang master. Ang kopya nito ay sabay-sabay na ipinapadala sa daan-daang laptop sa network, kahit walang OS ang mga ito at kahit iba-iba ang brand at model. Pagkatapos, kusang tinatapos ng bawat laptop ang setup at updates nang mag-isa.</p>
+  <div class="facts">
+    <div class="fact"><b>600</b><span>laptops, halo-halong model</span></div>
+    <div class="fact"><b>1</b><span>master image para sa lahat</span></div>
+    <div class="fact"><b>~100</b><span>laptops bawat batch</span></div>
+    <div class="fact"><b>1–2 araw</b><span>tantiya para sa lahat</span></div>
+  </div>
+</header>
+
+<main>
+
+<section>
+  <div class="sec-head">
+    <span class="num">01 · ANG DALOY</span>
+    <h2>Paano dumadaloy ang image</h2>
+    <p>Isang stream lang ang ipinapadala ng imaging server, at sabay-sabay itong tinatanggap ng lahat ng laptop sa batch (multicast). Kaya halos pareho lang ang bilis kahit 10 o 100 ang laptop.</p>
+  </div>
+  <div class="panel figure">
+    <svg viewBox="0 0 980 390" role="img" aria-label="Diagram: Master laptop papuntang imaging server, papuntang switch, papuntang 100 laptops">
+      <g>
+        <path d="M585 62c-14 0-24-10-22-22 2-11 13-17 23-14 4-12 16-20 30-18 12 1 21 9 24 19 11-2 22 6 22 17 0 10-9 18-20 18z" class="box"/>
+        <text x="618" y="48" text-anchor="middle" class="t">Internet</text>
+        <rect x="560" y="92" width="116" height="38" rx="6" class="box"/>
+        <text x="618" y="116" text-anchor="middle" class="t-b">Router</text>
+        <path d="M618 70v22" class="wire"/>
+        <path d="M618 130v74" class="wire-d"/>
+        <text x="626" y="174" class="t-m">Windows Update</text>
+      </g>
+      <use href="#lap" x="34" y="182" width="126" height="84" class="st-run"/>
+      <text x="97" y="290" text-anchor="middle" class="t-b">Master Laptop</text>
+      <text x="97" y="308" text-anchor="middle" class="t-m">golden image</text>
+      <path d="M168 226h96" class="wire" marker-end="url(#arr)"/>
+      <text x="216" y="216" text-anchor="middle" class="t-a">capture</text>
+      <rect x="274" y="148" width="200" height="186" rx="10" class="box"/>
+      <rect x="274" y="148" width="200" height="40" rx="10" class="s-ink"/>
+      <rect x="274" y="176" width="200" height="12" class="s-ink"/>
+      <text x="374" y="174" text-anchor="middle" class="t-b" style="fill:var(--bg)">Imaging Server</text>
+      <rect x="290" y="210" width="168" height="54" rx="6" class="box-a"/>
+      <text x="374" y="234" text-anchor="middle" class="t" style="font-weight:600">Windows 11 image</text>
+      <text x="374" y="252" text-anchor="middle" class="t-m">Windows + apps</text>
+      <text x="374" y="300" text-anchor="middle" class="t-m">network boot</text>
+      <path d="M474 226h84" class="wire-a" marker-end="url(#arrA)"/>
+      <text x="516" y="216" text-anchor="middle" class="t-a">1 stream</text>
+      <rect x="560" y="204" width="116" height="46" rx="6" class="s-ink"/>
+      <g class="s-ok">
+        <rect x="572" y="230" width="8" height="8" rx="1"/><rect x="584" y="230" width="8" height="8" rx="1"/><rect x="596" y="230" width="8" height="8" rx="1"/><rect x="608" y="230" width="8" height="8" rx="1"/><rect x="620" y="230" width="8" height="8" rx="1"/><rect x="632" y="230" width="8" height="8" rx="1"/><rect x="644" y="230" width="8" height="8" rx="1"/><rect x="656" y="230" width="8" height="8" rx="1"/>
+      </g>
+      <text x="618" y="222" text-anchor="middle" class="t" style="fill:var(--bg);font-size:12px">Gigabit Switch</text>
+      <g class="wire">
+        <path d="M676 227C710 227 712 157 742 157"/><path d="M676 227C710 227 712 207 742 207"/>
+        <path d="M676 227C710 227 712 257 742 257"/><path d="M676 227C710 227 712 307 742 307"/>
+      </g>
+      <use href="#lap" x="744" y="140" width="52" height="35" class="st-done"/>
+      <use href="#lap" x="816" y="140" width="52" height="35" class="st-done"/>
+      <use href="#lap" x="888" y="140" width="52" height="35" class="st-done"/>
+      <use href="#lap" x="744" y="190" width="52" height="35" class="st-run"/>
+      <use href="#lap" x="816" y="190" width="52" height="35" class="st-run"/>
+      <use href="#lap" x="888" y="190" width="52" height="35" class="st-run"/>
+      <use href="#lap" x="744" y="240" width="52" height="35" class="st-run"/>
+      <use href="#lap" x="816" y="240" width="52" height="35" class="st-run"/>
+      <use href="#lap" x="888" y="240" width="52" height="35" class="st-run"/>
+      <use href="#lap" x="744" y="290" width="52" height="35" class="st-wait"/>
+      <use href="#lap" x="816" y="290" width="52" height="35" class="st-wait"/>
+      <use href="#lap" x="888" y="290" width="52" height="35" class="st-wait"/>
+      <text x="842" y="352" text-anchor="middle" class="t-b">×100 bawat batch</text>
+      <text x="842" y="370" text-anchor="middle" class="t-m">Intel at AMD · iba-ibang model</text>
+      <g transform="translate(34 360)">
+        <circle cx="6" cy="0" r="6" class="s-ok"/><text x="18" y="4" class="t-m">tapos</text>
+        <circle cx="76" cy="0" r="6" class="s-accent"/><text x="88" y="4" class="t-m">nag-iimage</text>
+        <circle cx="176" cy="0" r="6" class="s-muted"/><text x="188" y="4" class="t-m">naghihintay</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="num">02 · ANG KONSEPTO</span>
+    <h2>Apat na yugto</h2>
+  </div>
+  <ol class="cards">
+    <li><h3>Ihanda ang master</h3><p>Isang laptop ang nilalagyan ng Windows 11, updates, at lahat ng apps na kailangan ng lahat. Ito ang magiging "template".</p></li>
+    <li><h3>Kunan ng image</h3><p>Ginagawang pangkalahatan ang master para gumana sa kahit anong model, tapos kinokopya ito papunta sa imaging server.</p></li>
+    <li><h3>Ipadala sa batch</h3><p>Ikinakabit sa network ang ~100 laptop. Nagbo-boot sila mula sa network at sabay-sabay na tumatanggap ng iisang image.</p></li>
+    <li><h3>Kusang matatapos</h3><p>Ang bawat laptop ay nagse-setup nang mag-isa, binibigyan ng sariling pangalan, at nagwi-Windows Update (kasama ang drivers) hanggang wala nang kulang.</p></li>
+  </ol>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="num">03 · BAWAT LAPTOP</span>
+    <h2>Ang pinagdadaanan ng isang laptop</h2>
+    <p>Dalawang beses lang kikilos ang tao bawat batch. Ang iba ay automatic.</p>
+  </div>
+  <div class="panel" style="display:grid;gap:14px">
+    <ol class="track">
+      <li class="manual"><b>Kabit + on</b><span>LAN, charger, power</span></li>
+      <li class="auto"><b>Register</b><span>~1 min, auto</span></li>
+      <li class="manual"><b>Start batch</b><span>isang click</span></li>
+      <li><b>Image</b><span>~10–20 min, sabay-sabay</span></li>
+      <li class="auto"><b>Setup</b><span>walang setup screens</span></li>
+      <li class="auto"><b>Pangalan</b><span>LAPTOP-001, 002…</span></li>
+      <li class="auto"><b>Windows Update</b><span>kasama drivers, hanggang tapos</span></li>
+    </ol>
+    <div class="legend"><span><i style="border-color:var(--amber);background:var(--amber)"></i>tao ang kikilos</span><span><i style="border-color:var(--accent)"></i>imaging server</span><span><i style="border-color:var(--ok)"></i>automatic sa laptop</span></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="num">04 · BAKIT GANITO</span>
+    <h2>Ang mga benepisyo</h2>
+  </div>
+  <div class="why">
+    <div class="panel"><h3>Isang image, lahat ng model</h3><p>Intel man o AMD, iba-ibang brand. Ang Windows Update ang naglalagay ng tamang drivers sa bawat laptop.</p></div>
+    <div class="panel"><h3>Pare-pareho ang lahat</h3><p>Parehong Windows, apps, at settings sa 600 laptop. Walang nakakalimutang i-install.</p></div>
+    <div class="panel"><h3>Mabilis kahit marami</h3><p>Dahil multicast, isang stream lang para sa buong batch. Hindi bumabagal kahit dumami ang laptop.</p></div>
+    <div class="panel"><h3>Madaling i-update</h3><p>Kapag may bagong update o app, ang master lang ang aayusin at kukunan ulit ng image.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="num">05 · TANTIYA</span>
+    <h2>Gaano katagal?</h2>
+  </div>
+  <div class="panel">
+    <div class="planner">
+      <label for="p-total">Bilang ng laptops<input id="p-total" type="number" min="1" value="600"></label>
+      <label for="p-batch">Laptops bawat batch<input id="p-batch" type="number" min="1" value="100"></label>
+      <label for="p-gb">Laki ng image (GB)<input id="p-gb" type="number" min="1" value="25"></label>
+      <label for="p-setup">Pagkakabit bawat batch (min)<input id="p-setup" type="number" min="0" value="60"></label>
+    </div>
+    <div class="out" aria-live="polite">
+      <div><b id="o-batches">6</b><span>batches</span></div>
+      <div><b id="o-image">~13 min</b><span>imaging bawat batch</span></div>
+      <div><b id="o-total">~8 oras</b><span>kabuuang oras ng trabaho</span></div>
+    </div>
+    <p class="caption">Ipinapalagay na ~3 GB bawat minuto sa gigabit network, dagdag ang ~5 minutong boot. Hindi pa kasama ang Windows Update, na tumatakbo nang mag-isa habang inaasikaso ang susunod na batch.</p>
+  </div>
+</section>
+
+</main>
+<footer>Concept overview lamang. Ang aktuwal na setup at configuration ay hawak ng IT team.</footer>
+</div>
+
+<script>
+function num(id){ var v = parseFloat(document.getElementById(id).value); return isFinite(v) && v > 0 ? v : 0; }
+function plan(){
+  var total = num('p-total'), batch = num('p-batch') || 1, gb = num('p-gb'), setup = num('p-setup');
+  var batches = Math.ceil(total / batch);
+  var imgMin = Math.round(gb / 3 + 5);
+  var totalMin = batches * (imgMin + setup);
+  document.getElementById('o-batches').textContent = batches;
+  document.getElementById('o-image').textContent = '~' + imgMin + ' min';
+  document.getElementById('o-total').textContent = totalMin < 120 ? '~' + totalMin + ' min' : '~' + Math.round(totalMin / 60) + ' oras';
+}
+['p-total','p-batch','p-gb','p-setup'].forEach(function(id){ document.getElementById(id).addEventListener('input', plan); });
+plan();
+</script>
+</body>
+</html>

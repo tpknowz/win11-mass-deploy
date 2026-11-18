@@ -1,0 +1,5 @@
+# Website lang ang ina-upload. Lahat ng iba ay local lang.
+*
+!.gitignore
+!.nojekyll
+!index.html
